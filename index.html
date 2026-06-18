@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>明星堂 · 家族风采墙</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:SimHei,黑体;}
+body{background:#fefefe;font-size:20px;color:#111;line-height:1.7;padding-bottom:120px;}
+/* 顶部明星堂横幅 */
+.header-banner{width:100%;background:#a8071a;color:#ffd700;padding:40px 20px;text-align:center;}
+.main-title{font-size:76px;font-weight:bold;letter-spacing:8px;}
+.sub-title{font-size:26px;margin-top:8px;opacity:0.9}
+/* 上传发布区域 */
+.upload-box{padding:20px 15px;border-bottom:3px solid #a8071a;}
+.upload-title{font-size:30px;text-align:center;margin-bottom:15px;color:#a8071a;font-weight:bold;}
+.file-input{width:100%;font-size:18px;margin-bottom:10px;}
+.upload-desc{width:100%;padding:12px;font-size:22px;border:2px solid #ccc;border-radius:6px;margin:10px 0;}
+.upload-btn{width:100%;background:#a8071a;color:#fff;border:none;padding:14px;font-size:26px;border-radius:8px;font-weight:bold;}
+/* 分类栏目导航 */
+.nav-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:15px;}
+.nav-item{background:#f0e6e6;text-align:center;padding:22px 8px;border-radius:12px;border:2px solid #a8071a;}
+.nav-icon{font-size:36px;margin-bottom:6px;}
+.nav-text{font-size:24px;font-weight:bold;color:#a8071a;}
+.nav-item.active{background:#a8071a;color:#fff;}
+.nav-item.active .nav-text{color:#fff;}
+/* 作品展示区（图文视频） */
+.work-wrap{padding:0 15px;}
+.work-item{border:2px solid #ddd;border-radius:10px;margin-bottom:25px;overflow:hidden;background:#fff;}
+.work-media{width:100%;display:block;max-height:600px;object-fit:contain;background:#000;}
+.work-info{padding:12px;}
+.work-cate{font-size:18px;color:#a8071a;margin-bottom:6px;}
+.work-text{font-size:22px;line-height:1.6;}
+.work-time{font-size:16px;color:#666;margin-top:8px;}
+/* 留言板区域 */
+.msg-container{margin-top:30px;padding:0 15px;}
+.msg-top{font-size:32px;text-align:center;color:#a8071a;font-weight:bold;margin-bottom:18px;border-top:4px solid #a8071a;padding-top:20px;}
+.msg-name,.msg-content{width:100%;border:2px solid #aaa;padding:12px;font-size:22px;border-radius:6px;margin-bottom:12px;}
+.msg-submit{width:100%;background:#a8071a;color:#fff;border:none;padding:14px;font-size:26px;border-radius:8px;font-weight:bold;}
+.msg-list{margin-top:25px;}
+.msg-card{border:1px solid #bbb;padding:14px;margin-bottom:14px;border-radius:8px;background:#f9f9f9;}
+.msg-author{font-size:24px;font-weight:bold;color:#a8071a;}
+.msg-date{font-size:16px;color:#555;margin:6px 0;}
+.msg-word{font-size:22px;}
+/* 底部空白避让 */
+.bottom-empty{height:40px;}
+</style>
+</head>
+<body>
+<!-- 顶部明星堂标题 -->
+<div class="header-banner">
+    <div class="main-title">明星堂</div>
+    <div class="sub-title">家族全体家人风采纪念墙</div>
+</div>
+
+<!-- 照片/视频发布模块 -->
+<div class="upload-box">
+    <div class="upload-title">发布照片/视频</div>
+    <input type="file" id="fileUpload" accept="image/*,video/*" class="file-input">
+    <select id="cateSelect" style="width:100%;font-size:22px;padding:10px;border:2px solid #ccc;border-radius:6px;margin:8px 0;">
+        <option value="news">家族新闻</option>
+        <option value="hometown">家乡风采</option>
+        <option value="activity">家乡活动</option>
+    </select>
+    <textarea id="workDesc" class="upload-desc" rows="3" placeholder="写下这段照片/视频的说明文字"></textarea>
+    <button class="upload-btn" id="submitWork">发布到风采墙</button>
+</div>
+
+<!-- 三大栏目分类切换 -->
+<div class="nav-box">
+    <div class="nav-item" data-cate="all">
+        <div class="nav-icon">📰</div>
+        <div class="nav-text">全部作品</div>
+    </div>
+    <div class="nav-item" data-cate="news">
+        <div class="nav-icon">📢</div>
+        <div class="nav-text">家族新闻</div>
+    </div>
+    <div class="nav-item" data-cate="hometown">
+        <div class="nav-icon">🏡</div>
+        <div class="nav-text">家乡风采</div>
+    </div>
+    <div class="nav-item" data-cate="activity" style="grid-column: 1 / -1;">
+        <div class="nav-icon">🎉</div>
+        <div class="nav-text">家乡活动</div>
+    </div>
+</div>
+
+<!-- 图文视频展示区域 -->
+<div class="work-wrap" id="workList"></div>
+
+<!-- 全员留言板 -->
+<div class="msg-container">
+    <div class="msg-top">家人留言板（全员可见）</div>
+    <input type="text" class="msg-name" id="msgName" placeholder="输入您的姓名">
+    <textarea class="msg-content" id="msgText" rows="4" placeholder="写下想对家人说的话，支持手机手写输入"></textarea>
+    <button class="msg-submit" id="sendMsg">提交留言</button>
+    <div class="msg-list" id="msgList"></div>
+</div>
+<div class="bottom-empty"></div>
+
+<script>
+// 本地存储图文视频、留言数据
+let workData = JSON.parse(localStorage.getItem("starHallWork")) || [];
+let msgData = JSON.parse(localStorage.getItem("starHallMsg")) || [];
+let currentFilter = "all";
+
+// 页面DOM节点
+const workList = document.getElementById("workList");
+const msgList = document.getElementById("msgList");
+const fileUpload = document.getElementById("fileUpload");
+const cateSelect = document.getElementById("cateSelect");
+const workDesc = document.getElementById("workDesc");
+const submitWork = document.getElementById("submitWork");
+const msgName = document.getElementById("msgName");
+const msgText = document.getElementById("msgText");
+const sendMsg = document.getElementById("sendMsg");
+const navItems = document.querySelectorAll(".nav-item");
+
+// 分类文字对应表
+const cateMap = {
+    news: "家族新闻",
+    hometown: "家乡风采",
+    activity: "家乡活动"
+};
+
+// 默认激活【全部作品】
+navItems[0].classList.add("active");
+
+// 点击栏目切换筛选内容
+navItems.forEach(item=>{
+    item.addEventListener("click",()=>{
+        navItems.forEach(nav=>nav.classList.remove("active"));
+        item.classList.add("active");
+        currentFilter = item.dataset.cate;
+        renderWork();
+    })
+})
+
+// 渲染风采墙所有图文视频
+function renderWork(){
+    workList.innerHTML = "";
+    let filterArr = currentFilter === "all" 
+        ? workData 
+        : workData.filter(item=>item.cate === currentFilter);
+    filterArr.forEach(item=>{
+        let mediaDom = "";
+        if(item.type.startsWith("image")){
+            mediaDom = `<img class="work-media" src="${item.src}" alt="家族照片">`;
+        }else{
+            mediaDom = `<video class="work-media" controls src="${item.src}"></video>`;
+        }
+        let html = `
+        <div class="work-item">
+            ${mediaDom}
+            <div class="work-info">
+                <div class="work-cate">【${cateMap[item.cate]}】</div>
+                <div class="work-text">${item.desc}</div>
+                <div class="work-time">发布时间：${item.time}</div>
+            </div>
+        </div>
+        `;
+        workList.innerHTML += html;
+    })
+}
+
+// 渲染全部历史留言
+function renderMsg(){
+    msgList.innerHTML = "";
+    msgData.forEach(item=>{
+        let html = `
+        <div class="msg-card">
+            <div class="msg-author">${item.name}</div>
+            <div class="msg-date">${item.time}</div>
+            <div class="msg-word">${item.content}</div>
+        </div>
+        `;
+        msgList.innerHTML += html;
+    })
+}
+
+// 上传图片/视频发布
+submitWork.addEventListener("click",()=>{
+    let file = fileUpload.files[0];
+    let desc = workDesc.value.trim();
+    let cate = cateSelect.value;
+    if(!file){
+        alert("请先选择照片或视频文件");
+        return;
+    }
+    if(!desc){
+        alert("请填写这段内容的文字说明");
+        return;
+    }
+    let reader = new FileReader();
+    reader.onload = function(e){
+        let now = new Date();
+        let timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`;
+        let newWork = {
+            src: e.target.result,
+            type: file.type,
+            cate: cate,
+            desc: desc,
+            time: timeStr
+        };
+        // 新发布内容置顶
+        workData.unshift(newWork);
+        localStorage.setItem("starHallWork",JSON.stringify(workData));
+        // 清空输入框
+        fileUpload.value = "";
+        workDesc.value = "";
+        renderWork();
+        alert("发布成功，所有家人打开页面都能看到！");
+    }
+    reader.readAsDataURL(file);
+})
+
+// 提交留言保存
+sendMsg.addEventListener("click",()=>{
+    let name = msgName.value.trim();
+    let content = msgText.value.trim();
+    if(!name || !content){
+        alert("请填写姓名和留言内容");
+        return;
+    }
+    let now = new Date();
+    let timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+    let newMsg = {
+        name: name,
+        content: content,
+        time: timeStr
+    };
+    msgData.unshift(newMsg);
+    localStorage.setItem("starHallMsg",JSON.stringify(msgData));
+    msgName.value = "";
+    msgText.value = "";
+    renderMsg();
+    alert("留言提交完成，永久保存！");
+})
+
+// 页面加载自动渲染内容、留言
+renderWork();
+renderMsg();
+</script>
+</body>
+</html>
